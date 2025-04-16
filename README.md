@@ -2,6 +2,11 @@
 
 This project is a Next.js application designed to generate PDF documents from public webpage URLs using Puppeteer connected to a Browserless.io instance. It features a simple web interface for user interaction, efficient streaming, and a caching mechanism.
 
+
+## Demo
+
+![Application Demo](./demo.gif)
+
 ## Core Features
 
 *   **API Endpoint:** Provides a `/api/generate-pdf` endpoint to handle PDF generation requests.
