@@ -1,12 +1,11 @@
 import { ICacheProvider } from '@/interfaces/ICacheProvider';
-import { redis } from '@/lib/redis'; // Assuming singleton redis instance
+import { redis } from '@/lib/redis';
 import fs from 'fs';
 import fsp from 'fs/promises';
 import path from 'path';
 import { Readable, PassThrough } from 'stream';
 import { pipeline } from 'stream/promises';
 
-// Configuration (Consider moving to a central config)
 const CACHE_DIR = path.join(process.cwd(), '.pdfcache');
 const CACHE_PREFIX = 'pdfcache:';
 
@@ -27,7 +26,7 @@ export class RedisFsCacheProvider implements ICacheProvider {
                 await fsp.mkdir(this.cacheDir, { recursive: true });
             } else {
                 console.error(`Error accessing cache directory ${this.cacheDir}:`, error);
-                throw error; // Re-throw if it's not a "not found" error
+                throw error;
             }
         }
     }
@@ -37,7 +36,6 @@ export class RedisFsCacheProvider implements ICacheProvider {
     }
 
     private generateCacheFilePath(key: string): string {
-        // Sanitize key to be filename-safe
         const filename = key.replace(/[^a-z0-9_-]/gi, '_').substring(0, 200);
         return path.join(this.cacheDir, `${filename}_${Date.now()}.pdf`);
     }
@@ -52,7 +50,6 @@ export class RedisFsCacheProvider implements ICacheProvider {
         }
 
         try {
-            // Check if file still exists (it might have been cleaned up)
             await fsp.access(cachedPath);
             console.log(`Cache hit for key: ${redisKey}, serving from ${cachedPath}`);
             return fs.createReadStream(cachedPath);
@@ -65,7 +62,7 @@ export class RedisFsCacheProvider implements ICacheProvider {
     }
 
     async set(key: string, sourceStream: Readable, ttlSeconds: number): Promise<void> {
-        await this.ensureCacheDirExists(); // Ensure dir exists before writing
+        await this.ensureCacheDirExists();
         const redisKey = this.getCacheKey(key);
         const tempFilePath = this.generateCacheFilePath(key);
         const cacheWriteStream = fs.createWriteStream(tempFilePath);
@@ -73,7 +70,6 @@ export class RedisFsCacheProvider implements ICacheProvider {
         console.log(`Attempting to cache stream for key ${redisKey} to ${tempFilePath}`);
 
         try {
-            // Use pipeline to handle stream errors and ensure completion
             await pipeline(sourceStream, cacheWriteStream);
 
             console.log(`Successfully cached PDF to ${tempFilePath} for key ${redisKey}`);
@@ -87,12 +83,10 @@ export class RedisFsCacheProvider implements ICacheProvider {
                 await fsp.unlink(tempFilePath);
                 console.log(`Deleted incomplete cache file ${tempFilePath}`);
             } catch (unlinkError: any) {
-                // Log if deletion fails but don't block the original error
                  if (unlinkError.code !== 'ENOENT') { // Ignore if already gone
                     console.error(`Failed to delete incomplete cache file ${tempFilePath}:`, unlinkError);
                  }
             }
-            // Re-throw the original pipeline error
             throw error;
         }
     }

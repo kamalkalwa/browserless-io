@@ -8,15 +8,13 @@ import { PdfApiClient } from '@/services/PdfApiClient';
 
 const apiClient: IApiClient = new PdfApiClient();
 
-// --- Simulated Progress ---
 const progressStages = [
     "Connecting...",
     "Navigating page...",
     "Waiting for resources...",
     "Generating PDF...",
 ];
-const stageDuration = 5000; // ms per stage (adjust as needed)
-// ---
+const stageDuration = 5000;
 
 export default function Home() {
     const [url, setUrl] = useState<string>('');
@@ -42,20 +40,16 @@ export default function Home() {
     useEffect(() => {
         if (isLoading) {
             currentStageIndexRef.current = 0;
-            setProgressStageText(progressStages[0]); // Start immediately
+            setProgressStageText(progressStages[0]);
 
             progressIntervalRef.current = setInterval(() => {
                 currentStageIndexRef.current++;
                 if (currentStageIndexRef.current < progressStages.length) {
                     setProgressStageText(progressStages[currentStageIndexRef.current]);
-                } else {
-                    // Keep showing the last stage if process takes longer than simulation
-                    // Or clear interval: if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
                 }
             }, stageDuration);
 
         } else {
-            // Clear interval and reset text when not loading
             if (progressIntervalRef.current) {
                 clearInterval(progressIntervalRef.current);
                 progressIntervalRef.current = null;
@@ -63,7 +57,6 @@ export default function Home() {
             setProgressStageText('');
         }
 
-        // Cleanup interval on component unmount
         return () => {
             if (progressIntervalRef.current) {
                 clearInterval(progressIntervalRef.current);
@@ -112,14 +105,14 @@ export default function Home() {
                  />
             </div>
 
-            {/* Right Column: Dynamic Area (Placeholder, Loader, Preview, Error) */}
+            {/* Right Column: Dynamic Area */}
             <div className="w-full md:w-2/3 lg:w-3/4 md:pl-4 lg:pl-8 flex flex-col">
                  <PreviewArea
                     isLoading={isLoading}
                     error={error}
                     pdfBlobUrl={pdfBlobUrl}
                     progressStageText={progressStageText}
-                    urlForFilename={url} // Pass URL for download filename
+                    urlForFilename={url}
                  />
             </div>
         </main>

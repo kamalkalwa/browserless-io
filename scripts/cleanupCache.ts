@@ -1,23 +1,12 @@
-// Ensure these lines are commented out or removed:
-// import dotenv from 'dotenv';
-// dotenv.config({ path: '.env.local' });
-
-// --- DEBUGGING STEP ---
-console.log(`[DEBUG] REDIS_URL before imports: ${process.env.REDIS_URL}`);
-// --- END DEBUGGING STEP ---
-
 import fs from 'fs/promises';
 import path from 'path';
-import { redis } from '@/lib/redis'; // Assuming redis client can be imported
+import { redis } from '@/lib/redis';
 
-// --- Configuration (Consider moving to a shared config file) ---
 const CACHE_DIR = path.join(process.cwd(), '.pdfcache');
-// Get TTL from env or default, ensure it's a number
 const CACHE_TTL_SECONDS = parseInt(process.env.CACHE_TTL_SECONDS || '3600', 10);
 // Add a buffer to TTL to avoid race conditions (e.g., 10 minutes)
 const CLEANUP_BUFFER_SECONDS = 600;
 const MAX_AGE_MS = (CACHE_TTL_SECONDS + CLEANUP_BUFFER_SECONDS) * 1000;
-// --- End Configuration ---
 
 
 async function cleanupOrphanedCacheFiles() {
@@ -28,8 +17,7 @@ async function cleanupOrphanedCacheFiles() {
     let filesChecked = 0;
 
     try {
-        // Check if cache directory exists
-        try {
+                try {
             await fs.access(CACHE_DIR);
         } catch (accessError) {
             console.log('Cache directory does not exist. Nothing to clean.');
@@ -43,7 +31,7 @@ async function cleanupOrphanedCacheFiles() {
         const now = Date.now();
 
         for (const file of files) {
-            if (!file.endsWith('.pdf')) { // Basic check to skip non-pdf files if any
+            if (!file.endsWith('.pdf')) {
                 console.log(`Skipping non-pdf file: ${file}`);
                 continue;
             }
@@ -79,7 +67,6 @@ async function cleanupOrphanedCacheFiles() {
         console.error('Error during cache cleanup process:', error);
     } finally {
         // Ensure Redis connection is closed if the script is standalone
-        // Check if redis has a quit/disconnect method
         if (redis && typeof redis.quit === 'function') {
             await redis.quit();
             console.log("Redis connection closed.");
@@ -90,7 +77,6 @@ async function cleanupOrphanedCacheFiles() {
     }
 }
 
-// Run the cleanup function
 cleanupOrphanedCacheFiles().catch(err => {
     console.error("Unhandled error in cleanup script:", err);
     process.exit(1);
