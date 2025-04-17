@@ -41,7 +41,7 @@ This project is a Next.js application designed to generate PDF documents from pu
 
 1.  **Clone the repository:**
     ```bash
-    git clone <your-repository-url>
+    git clone https://github.com/kamalkalwa/browserless-io.git
     cd browserlessio
     ```
 
