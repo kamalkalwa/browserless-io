@@ -47,9 +47,7 @@ async function cleanupOrphanedCacheFiles() {
                     await fs.unlink(filePath);
                     filesDeleted++;
                 }
-                // Optional: More robust check - query Redis if ANY key points to this filePath.
-                // This is more complex as it requires scanning Redis values or maintaining an index.
-                // For simplicity, age-based cleanup is often sufficient.
+                // Age-based cleanup is generally sufficient.
 
             } catch (statOrUnlinkError: any) {
                 if (statOrUnlinkError.code === 'ENOENT') {

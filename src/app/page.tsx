@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import UrlInputForm from '@/components/UrlInputForm'; // Assuming path
-import PreviewArea from '@/components/PreviewArea'; // Create this component
+import UrlInputForm from '@/components/UrlInputForm';
+import PreviewArea from '@/components/PreviewArea';
 import { IApiClient } from '@/interfaces/IApiClient';
 import { PdfApiClient } from '@/services/PdfApiClient';
 
@@ -25,7 +25,6 @@ export default function Home() {
     const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const currentStageIndexRef = useRef<number>(0);
 
-    // Clean up Object URL
     useEffect(() => {
         const currentUrl = pdfBlobUrl;
         return () => {
@@ -36,7 +35,6 @@ export default function Home() {
         };
     }, [pdfBlobUrl]);
 
-    // Manage Simulated Progress Timer
     useEffect(() => {
         if (isLoading) {
             currentStageIndexRef.current = 0;
@@ -68,7 +66,7 @@ export default function Home() {
     const handleGeneratePdf = async (submittedUrl: string) => {
         setIsLoading(true);
         setError(null);
-        setPdfBlobUrl(null); // Clear previous result
+        setPdfBlobUrl(null);
 
         try {
             const response = await apiClient.generatePdf(submittedUrl);
@@ -78,7 +76,7 @@ export default function Home() {
                 try {
                     const errorJson = await response.json();
                     errorMsg = errorJson.error || errorJson.message || errorMsg;
-                } catch (e) { /* Ignore */ }
+                } catch (e) { /* Ignore JSON parse error */ }
                 throw new Error(errorMsg);
             }
 
@@ -91,13 +89,12 @@ export default function Home() {
             setError(err.message || 'An unexpected error occurred.');
             setPdfBlobUrl(null);
         } finally {
-            setIsLoading(false); // This will also stop the progress simulation timer
+            setIsLoading(false);
         }
     };
 
     return (
         <main className="flex min-h-screen flex-col md:flex-row items-stretch justify-center p-4 sm:p-8 md:p-12 bg-gradient-to-br from-gray-100 to-blue-100">
-            {/* Left Column: Input Form */}
             <div className="w-full md:w-1/3 lg:w-1/4 md:pr-4 lg:pr-8 flex-shrink-0 mb-6 md:mb-0">
                  <UrlInputForm
                     isLoading={isLoading}
@@ -105,7 +102,6 @@ export default function Home() {
                  />
             </div>
 
-            {/* Right Column: Dynamic Area */}
             <div className="w-full md:w-2/3 lg:w-3/4 md:pl-4 lg:pl-8 flex flex-col">
                  <PreviewArea
                     isLoading={isLoading}

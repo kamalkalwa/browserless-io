@@ -55,7 +55,7 @@ export class RedisFsCacheProvider implements ICacheProvider {
             return fs.createReadStream(cachedPath);
         } catch (error: any) {
             console.warn(`Cache file ${cachedPath} not found or inaccessible (key: ${redisKey}):`, error.code);
-            // File missing, treat as cache miss - potentially remove stale Redis key
+            // File missing, treat as cache miss and remove stale Redis key
             await redis.del(redisKey);
             return null;
         }

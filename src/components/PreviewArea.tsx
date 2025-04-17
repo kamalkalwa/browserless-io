@@ -7,10 +7,9 @@ interface PreviewAreaProps {
     error: string | null;
     pdfBlobUrl: string | null;
     progressStageText: string;
-    urlForFilename: string; // Used for download filename
+    urlForFilename: string;
 }
 
-// Simple Indeterminate Progress Bar Component
 const IndeterminateProgressBar = () => (
     <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
         <div className="bg-indigo-600 h-2.5 rounded-full animate-indeterminate-progress"></div>
@@ -27,18 +26,18 @@ export default function PreviewArea({
     const downloadLinkRef = useRef<HTMLAnchorElement>(null);
     const iframeRef = useRef<HTMLIFrameElement>(null);
 
-    // Animation effect for download button pulse
     useEffect(() => {
         if (pdfBlobUrl && downloadLinkRef.current) {
             const button = downloadLinkRef.current;
             button.classList.remove('animate-pulse-once');
-            requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
                  button.classList.add('animate-pulse-once');
             });
         }
     }, [pdfBlobUrl]);
 
     // Attempt to force iframe reload if URL changes but src is the same blob URL instance
+    // May not always work due to browser caching of blob URLs
     useEffect(() => {
         if (pdfBlobUrl && iframeRef.current) {
             iframeRef.current.src = pdfBlobUrl;
